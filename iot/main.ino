@@ -15,6 +15,11 @@ PubSubClient client(espClient);
 #define BOTAO 4
 #define LED   2
 
+// ================= CONTROLE =================
+bool modoAtivo = false;
+unsigned long ultimoClique = 0;
+const unsigned long debounce = 300;
+
 // ================= WIFI SETUP =================
 void setup_wifi() {
   delay(10);
@@ -37,9 +42,11 @@ void setup_wifi() {
 // ================= MQTT RECONNECT =================
 void reconnect() {
   while (!client.connected()) {
+    String clientId = "ESP32_Elevador_" + String(random(0xffff));
+
     Serial.print("Conectando ao MQTT...");
 
-    if (client.connect("ESP32_Elevador")) {
+    if (client.connect(clientId.c_str())) {
       Serial.println("conectado!");
       client.publish("elevador/status", "online");
     } else {
@@ -69,20 +76,25 @@ void loop() {
   }
   client.loop();
 
-  // Botão pressionado
-  if (digitalRead(BOTAO) == LOW) {
+  bool leituraBotao = digitalRead(BOTAO);
+
+  // debounce simples
+  if (leituraBotao == LOW && millis() - ultimoClique > debounce && !modoAtivo) {
+    ultimoClique = millis();
+    modoAtivo = true;
+
     Serial.println("Modo acessível ativado");
 
-    // Envia evento
     client.publish("elevador/evento", "modo_acessivel_ativado");
 
-    // Simula porta aberta (LED ligado)
     digitalWrite(LED, HIGH);
-    delay(20000); // tempo estendido 20 segundos
+
+    delay(20000); // segura a porta do elevador por 20 segundos
 
     digitalWrite(LED, LOW);
 
-    // Evita múltiplos disparos
-    delay(1000);
+    client.publish("elevador/evento", "modo_acessivel_finalizado");
+
+    modoAtivo = false;
   }
 }
