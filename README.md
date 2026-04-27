@@ -36,6 +36,9 @@ Fluxo do sistema:
 
 Botão → ESP32 → Wi-Fi → MQTT → Backend → App Mobile
 
+### Diagrama de Arquitetura
+
+![Diagrama de Arquitetura](assets/Diagrama.png)
 ---
 
 ## ⚙️ Tecnologias Utilizadas
