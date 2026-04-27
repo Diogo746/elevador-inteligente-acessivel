@@ -1,133 +1,154 @@
-# Elevador Inteligente Acessível (EIA)
+# 🚀 Elevador Inteligente Acessível (EIA)
 
 ## 📌 Descrição
 
-O projeto Elevador Inteligente Acessível (EIA) tem como objetivo melhorar a acessibilidade em elevadores dentro do Senac, promovendo autonomia para pessoas com deficiência (PCDs) por meio de uma solução baseada em IoT integrada com aplicação mobile.
+O projeto **Elevador Inteligente Acessível (EIA)** tem como objetivo melhorar a acessibilidade em elevadores no ambiente do Senac, promovendo maior autonomia para pessoas com deficiência (PCDs) por meio de uma solução baseada em **IoT integrada com aplicação mobile e backend em nuvem**.
 
 ---
 
 ## 🎯 Problema
 
-Os elevadores atuais não possuem mecanismos adaptativos, resultando em:
+Os elevadores convencionais não possuem mecanismos adaptativos inteligentes, resultando em:
 
-- Dependência de terceiros
-- Tempo insuficiente de abertura das portas
-- Risco de acidentes
-- Baixa autonomia para usuários com mobilidade reduzida
+- Dependência de terceiros para uso do elevador  
+- Tempo insuficiente de abertura de portas  
+- Risco de incidentes durante a entrada  
+- Baixa autonomia para usuários com mobilidade reduzida  
 
 ---
 
 ## 💡 Solução
 
-Desenvolvimento de um sistema IoT que permite ativar automaticamente o modo acessível do elevador.
+O sistema proposto implementa um **modo acessível inteligente**, ativado por hardware, capaz de adaptar o comportamento do elevador.
 
-Funcionalidades principais:
+Principais funcionalidades:
 
-- Ativação por botão físico
-- Aumento do tempo de abertura da porta
-- Registro de eventos
-- Integração com aplicação mobile
+- Ativação do modo acessível via botão físico ou sensor  
+- Ajuste automático do tempo de abertura da porta  
+- Comunicação em tempo real entre dispositivos  
+- Registro de eventos no backend  
+- Visualização de status via aplicação mobile  
 
 ---
 
-## 🏗️ Arquitetura
+## 🏗️ Arquitetura do Sistema
 
-Fluxo do sistema:
+O sistema segue uma arquitetura distribuída baseada em IoT:
+Botão / Sensor → ESP32 → Wi-Fi → MQTT → Backend (Firebase) → Aplicação Mobile
 
-Botão → ESP32 → Wi-Fi → MQTT → Backend → App Mobile
 
-### Diagrama de Arquitetura
+### 📷 Diagrama de Arquitetura
 
 ![Diagrama de Arquitetura](assets/Diagrama.png)
+
 ---
 
 ## ⚙️ Tecnologias Utilizadas
 
-- ESP32
-- MQTT (broker público)
+- ESP32 (microcontrolador)
+- MQTT (comunicação IoT)
 - Wi-Fi
-- Firebase (backend)
-- Flutter / Figma (mobile)
-- GitHub (versionamento)
+- Firebase (backend e armazenamento)
+- Flutter / Figma (interface mobile)
+- Git/GitHub (controle de versão)
 
 ---
 
 ## 🔄 Funcionamento
 
-1. Usuário pressiona o botão
-2. ESP32 detecta o evento
-3. Sistema ativa o modo acessível
-4. LED simula a porta aberta por mais tempo
-5. Evento é enviado via MQTT
-6. Dados podem ser visualizados no app
+1. Usuário ativa o sistema por botão ou sensor  
+2. O ESP32 detecta o evento  
+3. O modo acessível é ativado automaticamente  
+4. O tempo de abertura da porta é ajustado  
+5. O evento é enviado via MQTT para o backend  
+6. Os dados são armazenados no Firebase  
+7. O status pode ser visualizado no aplicativo mobile  
 
 ---
 
 ## 📋 Requisitos
 
-### Funcionais
-- Ativar modo acessível
-- Ajustar tempo da porta
-- Registrar eventos
+### ✔️ Funcionais
 
-### Não Funcionais
-- Resposta em até 2 segundos
-- Comunicação estável
-- Confiabilidade
-- Segurança básica
+- Ativação do modo acessível  
+- Ajuste automático do tempo da porta  
+- Comunicação entre ESP32 e backend via MQTT  
+- Registro de eventos no Firebase  
+- Exibição do estado do elevador no sistema  
+- Processamento de sensores físicos  
+- Retorno automático ao estado padrão  
+
+### ✔️ Não Funcionais
+
+- Tempo de resposta inferior a 2 segundos  
+- Comunicação MQTT confiável (QoS 1)  
+- Sistema com alta estabilidade de conexão  
+- Baixo consumo de recursos no ESP32  
+- Interface simples e intuitiva  
+- Não armazenamento de dados pessoais sensíveis (LGPD)  
 
 ---
 
-## 🔐 Segurança
+## 🔐 Segurança e LGPD
 
-- Validação de comandos
-- Controle básico de acesso
-- Registro de logs
+O sistema segue o princípio de **Security by Design**, com foco em segurança desde a concepção.
+
+- Validação de comandos no backend  
+- Controle de acesso a dispositivos autorizados  
+- Comunicação segura entre IoT e backend  
+- Registro de logs para auditoria  
+- Coleta mínima de dados operacionais  
+- Conformidade com a LGPD (sem dados pessoais identificáveis)  
 
 ---
 
 ## 🧪 Protótipo
 
-### IoT
-- ESP32 conectado ao Wi-Fi
-- Botão físico
-- LED simulando porta
-- Comunicação MQTT
+### 📡 IoT
+- ESP32 conectado via Wi-Fi  
+- Botão físico ou sensor de entrada  
+- LED simulando comportamento da porta  
+- Comunicação via MQTT  
 
-### Mobile
-- Protótipo de interface com:
-  - Tela de status
-  - Histórico de eventos
+### 📱 Mobile
+- Interface de monitoramento  
+- Visualização de status do elevador  
+- Histórico de eventos  
 
 ---
 
 ## 📊 Backlog
 
-Gerenciado via GitHub Projects (Kanban)
+O projeto é organizado em tarefas no formato Kanban (GitHub Projects), dividido em:
 
-Exemplos:
-
-- Como usuário, quero ativar o modo acessível
-- Como sistema, quero registrar eventos
-- Como admin, quero visualizar logs
+- Funcionalidades essenciais (MVP)  
+- Funcionalidades de suporte  
+- Melhorias futuras  
 
 ---
 
 ## 🚀 Como Executar
 
-### IoT
+### 📡 IoT (ESP32)
 
-1. Conectar ESP32
-2. Abrir código em /iot
-3. Configurar Wi-Fi
-4. Fazer upload
-5. Monitorar via Serial Monitor
+1. Conectar o ESP32 ao computador  
+2. Abrir o projeto na IDE Arduino  
+3. Configurar credenciais de Wi-Fi  
+4. Fazer upload do código  
+5. Monitorar via Serial Monitor  
 
 ---
 
 ## 📁 Estrutura do Projeto
 
-/iot → código do ESP32
-/mobile → protótipo ou app
-/docs → documentação
-/assets → imagens
+/iot → Código do ESP32
+/mobile → Aplicação mobile
+/docs → Documentação técnica
+/assets → Imagens e diagramas
+
+
+---
+
+## 📌 Observação Final
+
+Este projeto integra conceitos de **IoT, redes e desenvolvimento mobile**, demonstrando uma solução funcional para acessibilidade inteligente em ambientes institucionais.
