@@ -78,7 +78,7 @@ void loop() {
 
     // Simula porta aberta (LED ligado)
     digitalWrite(LED, HIGH);
-    delay(5000); // tempo estendido
+    delay(20000); // tempo estendido 20 segundos
 
     digitalWrite(LED, LOW);
 
