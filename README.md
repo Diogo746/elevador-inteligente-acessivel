@@ -31,6 +31,12 @@ Principais funcionalidades:
 
 ---
 
+### 📌 Diagrama de Caso de Uso
+
+![Caso de Uso](assets/CasodeUso.png)
+
+---
+
 ## 🏗️ Arquitetura do Sistema
 
 O sistema segue uma arquitetura distribuída baseada em IoT:
@@ -64,6 +70,11 @@ Botão / Sensor → ESP32 → Wi-Fi → MQTT → Backend (Firebase) → Aplicaç
 6. Os dados são armazenados no Firebase  
 7. O status pode ser visualizado no aplicativo mobile  
 
+---
+
+### 🔁 Fluxograma do Sistema
+
+![Fluxograma](assets/Fluxograma.png)
 ---
 
 ## 📋 Requisitos
@@ -108,7 +119,8 @@ O sistema segue o princípio de **Security by Design**, com foco em segurança d
 - ESP32 conectado via Wi-Fi  
 - Botão físico ou sensor de entrada  
 - LED simulando comportamento da porta  
-- Comunicação via MQTT  
+- Comunicação via MQTT
+
 
 ### 📱 Mobile
 - Interface de monitoramento  
