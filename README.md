@@ -77,6 +77,18 @@ Botão / Sensor → ESP32 → Wi-Fi → MQTT → Backend (Firebase) → Aplicaç
 ![Fluxograma](assets/Fluxograma.png)
 ---
 
+### 🛡️ Arquitetura Resiliente / Edge Computing
+
+![Fluxograma Resiliente](assets/ArquiteturaResiliente.png)
+
+---
+
+### 🔄 Diagrama de Sequência
+
+![Diagrama de Sequência](assets/DiagramaDeSequencia.png)
+
+---
+
 ## 📋 Requisitos
 
 ### ✔️ Funcionais
