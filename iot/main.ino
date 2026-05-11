@@ -1,253 +1,377 @@
 /*
- * ================================================================
- *  PROJETO IoT — ESP32 + BOTAO ACESSIVEL + LED + MQTT
- *  SENAC — Disciplina: IoT Aplicado | Versao Estruturada 1.0
- * ================================================================
- *
- *  BLOCO 1 — BIBLIOTECAS E DEPENDENCIAS
- *  --------------------------------------------------
- *  WiFi.h         -> Permite conectar o ESP32 à internet
- *  PubSubClient.h -> Permite comunicação MQTT
- * ================================================================
- */
+
+* ================================================================
+
+*  ESTRUTURA IoT — ELEVADOR INTELIGENTE ACESSÍVEL (EIA)
+
+*  Tecnologias: ESP32 + Botão/Sensor + LED + MQTT
+
+* ================================================================
+
+*
+
+*  BLOCO 1 — BIBLIOTECAS E DEPENDÊNCIAS
+
+*  - WiFi.h: ensina o ESP32 a usar a internet.
+
+*  - PubSubClient.h: ensina o ESP32 a mandar mensagens em tempo real (MQTT).
+
+*  - ArduinoJson.h: ensina o ESP32 a ler e escrever dados em JSON.
+
+* ================================================================
+
+*/
 
 #include <WiFi.h>
-#include <PubSubClient.h>
+
+#include <PubSubClient.h>   // Biblioteca para o MQTT
+
+#include <ArduinoJson.h>
+
 #include <Arduino.h>
-
+ 
 /*
- * ================================================================
- *  BLOCO 2 — PARAMETROS DO ALUNO E VARIAVEIS GLOBAIS
- *  --------------------------------------------------
- *  Configure aqui sua rede, broker MQTT e hardware.
- * ================================================================
- */
 
-// ================================================================
-//  1. CONFIGURACOES DE REDE
-// ================================================================
-const char* WIFI_SSID       = "Nome_Wifi";
-const char* WIFI_SENHA      = "senha";
+* ================================================================
 
-// ================================================================
-//  2. CONFIGURACOES MQTT
-// ================================================================
-const char* MQTT_SERVER     = "broker.hivemq.com";
-const int   MQTT_PORT       = 1883;
+*  BLOCO 2 — PARÂMETROS DO ALUNO E VARIÁVEIS GLOBAIS
 
-// Topicos MQTT
-const char* TOPICO_STATUS   = "elevador/status";
-const char* TOPICO_EVENTO   = "elevador/evento";
+* ================================================================
 
-// ================================================================
-//  3. HARDWARE E PINOS
-// ================================================================
-const int PINO_BOTAO        = 4;
-const int PINO_LED          = 2;
+*/
+ 
+// ── Identificação ─────────────────────────────────────────────
 
-// ================================================================
-//  4. REGRAS DE NEGOCIO
-// ================================================================
-const unsigned long DEBOUNCE_MS      = 300;
-const unsigned long TEMPO_ACESSIVEL  = 20000; // 20 segundos segurando a porta do elevador
+const char* ID_ELEVADOR = "ELEVADOR-SENAC-01";
+ 
+// ── Credenciais de Rede (WiFi) ────────────────────────────────
 
-// ================================================================
-//  5. VARIAVEIS DE ESTADO DO SISTEMA
-// ================================================================
-bool modoAtivo              = false;
-bool estadoLED              = false;
-unsigned long ultimoClique  = 0;
-unsigned long inicioModo    = 0;
+const char* WIFI_SSID      = "SENAC-Mesh";
 
-// Objetos principais
-WiFiClient espClient;
-PubSubClient client(espClient);
+const char* WIFI_SENHA     = "09080706";
+ 
+// ── Integração com a Nuvem (MQTT) ─────────────────────────────
 
+const char* MQTT_SERVIDOR  = "test.mosquitto.org"; // Broker MQTT de teste
+
+const int   MQTT_PORTA     = 1883;
+
+const char* TOPICO_ENVIO   = "senac/elevador/acessibilidade";
+ 
+// ── Hardware e Pinos (Esquemático) ────────────────────────────
+
+const int PINO_BOTAO = 4; // Pino onde o botão ou sensor está ligado
+
+const int PINO_LED   = 2; // LED azul da placa (simula a porta abrindo)
+ 
+// ── Lógica e Regras de Negócio ────────────────────────────────
+
+const unsigned long TEMPO_PORTA = 10000; // 10000 ms = 10 segundos de porta aberta
+ 
+// ── Variáveis de Estado do Sistema (Memória) ──────────────────
+
+unsigned long tempoAbertura = 0;     // Guarda a hora que a porta abriu
+
+bool portaAberta            = false; // Lembra se a porta está aberta ou fechada
+
+bool statusMudou            = false; // Avisa se precisamos mandar mensagem pra nuvem
+ 
+WiFiClient clienteWiFi;
+
+PubSubClient clienteMQTT(clienteWiFi);
+ 
 /*
- * ================================================================
- *  BLOCO 3 — PROTOTIPOS DE FUNCOES
- * ================================================================
- */
+
+* ================================================================
+
+*  BLOCO 3 — PROTÓTIPOS DE FUNÇÕES (O "ÍNDICE" DO CÓDIGO)
+
+* ================================================================
+
+*/
+
 void conectarWiFi();
-void verificarWiFi();
-void conectarMQTT();
-void verificarMQTT();
-void verificarBotao();
-void ativarModoAcessivel();
-void finalizarModoAcessivel();
 
+void verificarConexoes(); // Checa o WiFi e o MQTT
+
+bool lerSensorBotao();
+
+void acionarPorta();
+
+bool enviarParaNuvem(String evento);
+ 
 /*
- * ================================================================
- *  BLOCO 4 — SETUP (INICIALIZACAO)
- * ================================================================
- */
+
+* ================================================================
+
+*  BLOCO 4 — SETUP (INICIALIZAÇÃO)
+
+* ================================================================
+
+*/
+
 void setup() {
+
   Serial.begin(115200);
+
   delay(500);
 
   Serial.println("\n================================================");
-  Serial.println(" Sistema IoT — Elevador Acessivel");
+
+  Serial.println("  Sistema EIA — Elevador Inteligente Iniciando");
+
   Serial.println("================================================");
+ 
+  // Configura os pinos
 
-  // Configura pinos
-  pinMode(PINO_BOTAO, INPUT_PULLUP);
   pinMode(PINO_LED, OUTPUT);
-  digitalWrite(PINO_LED, LOW);
 
-  Serial.println("[OK] Hardware configurado.");
+  pinMode(PINO_BOTAO, INPUT_PULLUP); // Usa o resistor interno da placa para o botão
 
-  // WiFi
+  digitalWrite(PINO_LED, LOW);       // Começa com a porta fechada
+ 
+  // Conecta na internet e configura o MQTT
+
   conectarWiFi();
 
-  // MQTT
-  client.setServer(MQTT_SERVER, MQTT_PORT);
+  clienteMQTT.setServer(MQTT_SERVIDOR, MQTT_PORTA);
+ 
+  Serial.println("[OK] Setup concluído. Monitorando botão...\n");
 
-  Serial.println("[OK] Sistema inicializado com sucesso.\n");
 }
-
+ 
 /*
- * ================================================================
- *  BLOCO 5 — LOOP PRINCIPAL
- * ================================================================
- */
+
+* ================================================================
+
+*  BLOCO 5 — LOOP PRINCIPAL (O CORAÇÃO DO PROGRAMA)
+
+*  Fica girando sem parar, vigiando o botão e o relógio.
+
+* ================================================================
+
+*/
+
 void loop() {
-  
-  verificarWiFi();
-  verificarMQTT();
 
-  client.loop();
+  // Passo 1: Garantir que a internet e o MQTT continuam funcionando
 
-  verificarBotao();
+  verificarConexoes();
 
-  // Verifica se o modo acessível deve ser finalizado
-  if (modoAtivo && millis() - inicioModo >= TEMPO_ACESSIVEL) {
-    finalizarModoAcessivel();
+  clienteMQTT.loop(); // Mantém o MQTT vivo
+ 
+  // Passo 2: Ler o botão de acessibilidade
+
+  // Se a função lerSensorBotao() disser que foi apertado, ativamos o modo!
+
+  if (lerSensorBotao()) {
+
+    portaAberta = true;
+
+    statusMudou = true;
+
+    tempoAbertura = millis(); // Marca no relógio a hora que ativou
+
   }
-}
+ 
+  // Passo 3: Executar a regra de negócio (Atuar na porta)
 
+  acionarPorta();
+ 
+  // Passo 4: Enviar os dados para a Nuvem apenas quando algo mudar
+
+  if (statusMudou) {
+
+    String mensagem = portaAberta ? "Modo Acessível: Porta Aberta" : "Modo Normal: Porta Fechada";
+
+    enviarParaNuvem(mensagem);
+
+    statusMudou = false; // Reseta o aviso de mudança
+
+  }
+
+}
+ 
 /*
- * ================================================================
- *  BLOCO 6 — FUNCOES WIFI
- * ================================================================
- */
+
+* ================================================================
+
+*  BLOCO 6 — FUNÇÕES DE INTERNET (WIFI E MQTT)
+
+* ================================================================
+
+*/
+
 void conectarWiFi() {
-  Serial.print("[WiFi] Conectando em: ");
+
+  Serial.print("[WiFi] Conectando a rede: ");
+
   Serial.println(WIFI_SSID);
 
   WiFi.mode(WIFI_STA);
+
   WiFi.begin(WIFI_SSID, WIFI_SENHA);
+ 
+  while (WiFi.status() != WL_CONNECTED) {
 
-  int tentativas = 0;
-
-  while (WiFi.status() != WL_CONNECTED && tentativas < 20) {
-    digitalWrite(PINO_LED, !digitalRead(PINO_LED));
     delay(500);
+
     Serial.print(".");
-    tentativas++;
+
   }
 
-  Serial.println();
+  Serial.println("\n[WiFi] Sucesso! Estamos online.");
 
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("[WiFi] Conectado com sucesso!");
-    Serial.print("[WiFi] IP local: ");
-    Serial.println(WiFi.localIP());
-    digitalWrite(PINO_LED, LOW);
-  } else {
-    Serial.println("[WiFi] Falha na conexao.");
-  }
 }
+ 
+void verificarConexoes() {
 
-void verificarWiFi() {
+  // Se o WiFi cair, reconecta
+
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("[WiFi] Conexao perdida. Reconectando...");
-    WiFi.disconnect();
-    delay(1000);
+
     conectarWiFi();
+
   }
-}
 
-/*
- * ================================================================
- *  BLOCO 7 — FUNCOES MQTT
- * ================================================================
- */
-void conectarMQTT() {
-  while (!client.connected()) {
+  // Se o MQTT cair, reconecta
 
-    String clientId = "ESP32_Elevador_" + String(random(0xffff));
+  while (!clienteMQTT.connected()) {
 
-    Serial.print("[MQTT] Conectando...");
+    Serial.print("[MQTT] Tentando conectar...");
 
-    if (client.connect(clientId.c_str())) {
-      Serial.println(" conectado!");
-      client.publish(TOPICO_STATUS, "online");
+    String clientId = "EIA-" + String(random(0xffff), HEX);
+
+    if (clienteMQTT.connect(clientId.c_str())) {
+
+      Serial.println(" Conectado!");
 
     } else {
-      Serial.print(" falhou. rc=");
-      Serial.print(client.state());
-      Serial.println(" tentando novamente em 2 segundos...");
+
       delay(2000);
+
     }
-  }
-}
 
-void verificarMQTT() {
-  if (!client.connected()) {
-    conectarMQTT();
   }
-}
 
+}
+ 
 /*
- * ================================================================
- *  BLOCO 8 — LEITURA DO BOTAO + DEBOUNCE
- * ================================================================
- */
-void verificarBotao() {
-  
-  bool leituraBotao = digitalRead(PINO_BOTAO);
 
-  // Botao pressionado = LOW
-  if (leituraBotao == LOW &&
-      millis() - ultimoClique > DEBOUNCE_MS &&
-      !modoAtivo) {
+* ================================================================
 
-    ultimoClique = millis();
+*  BLOCO 7 — LEITURA DO SENSOR E VALIDAÇÃO
 
-    ativarModoAcessivel();
+* ================================================================
+
+*/
+
+bool lerSensorBotao() {
+
+  // O INPUT_PULLUP inverte a lógica: LOW significa que o botão foi apertado
+
+  bool botaoApertado = (digitalRead(PINO_BOTAO) == LOW);
+ 
+  // Só retorna verdadeiro se o botão for apertado E a porta já estiver fechada
+
+  if (botaoApertado && !portaAberta) {
+
+    Serial.println("[SENSOR] Botão de acessibilidade acionado!");
+
+    delay(200); // Pausa rápida para evitar "clique duplo" sem querer
+
+    return true;
+
   }
-}
 
+  return false;
+
+}
+ 
 /*
- * ================================================================
- *  BLOCO 9 — LOGICA DO MODO ACESSIVEL
- * ================================================================
- */
-void ativarModoAcessivel() {
 
-  modoAtivo = true;
-  inicioModo = millis();
+* ================================================================
 
-  Serial.println("[ELEVADOR] Modo acessivel ativado.");
+*  BLOCO 8 — ATUADOR (AGINDO NO MUNDO FÍSICO)
 
-  // Acende LED
-  digitalWrite(PINO_LED, HIGH);
-  estadoLED = true;
+* ================================================================
 
-  // Publica evento MQTT
-  client.publish(TOPICO_EVENTO, "modo_acessivel_ativado");
+*/
+
+void acionarPorta() {
+
+  // Se a porta está aberta, precisamos checar se já deu o tempo de fechar
+
+  if (portaAberta) {
+
+    digitalWrite(PINO_LED, HIGH); // Mantém o LED aceso (Porta aberta)
+ 
+    unsigned long tempoPassado = millis() - tempoAbertura;
+
+    // Se passou dos 10 segundos (TEMPO_PORTA)...
+
+    if (tempoPassado >= TEMPO_PORTA) {
+
+      digitalWrite(PINO_LED, LOW); // Apaga o LED (Fecha a porta)
+
+      portaAberta = false;
+
+      statusMudou = true; // Avisa que a porta fechou para mandar pra nuvem
+
+      Serial.println("[ATUADOR] Tempo esgotado. Porta fechada.");
+
+    }
+
+  }
+
 }
+ 
+/*
 
-void finalizarModoAcessivel() {
+* ================================================================
 
-  modoAtivo = false;
+*  BLOCO 9 — ENVIO PARA A API (A NUVEM VIA MQTT)
 
-  // Apaga LED
-  digitalWrite(PINO_LED, LOW);
-  estadoLED = false;
+* ================================================================
 
-  Serial.println("[ELEVADOR] Modo acessivel finalizado.");
+*/
 
-  // Publica evento MQTT
-  client.publish(TOPICO_EVENTO, "modo_acessivel_finalizado");
+bool enviarParaNuvem(String evento) {
+
+  // 1. Cria o objeto JSON
+
+  StaticJsonDocument<200> doc;
+
+  doc["dispositivo"] = ID_ELEVADOR;
+
+  doc["evento"]      = evento;
+
+  doc["porta_aberta"]= portaAberta;
+
+  doc["timestamp"]   = millis();
+ 
+  // 2. Transforma em texto (String)
+
+  String pacoteJSON;
+
+  serializeJson(doc, pacoteJSON);
+
+  Serial.println("[NUVEM] Enviando pacote: " + pacoteJSON);
+ 
+  // 3. Envia pelo MQTT (Publica no tópico)
+
+  bool sucesso = clienteMQTT.publish(TOPICO_ENVIO, pacoteJSON.c_str());
+ 
+  if (sucesso) {
+
+    Serial.println("[NUVEM] Sucesso! Aplicativo notificado.");
+
+  } else {
+
+    Serial.println("[NUVEM] Falha ao enviar a mensagem.");
+
+  }
+ 
+  return sucesso;
+
 }
