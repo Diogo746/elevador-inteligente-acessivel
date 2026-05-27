@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
@@ -22,4 +24,12 @@ public class Eventos {
 
     @Column(nullable = false)
     private TipoEvento tipo_evento;
+
+    @Column(nullable = false)
+    private LocalDate data_evento;
+
+    @Column(nullable = false)
+    private LocalTime hora_evento;
+
+
 }
