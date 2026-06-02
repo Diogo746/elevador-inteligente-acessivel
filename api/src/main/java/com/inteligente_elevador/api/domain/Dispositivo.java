@@ -6,18 +6,20 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-@Entity
+@Entity(name = "dispositivos")
 @Getter
 @Setter
-public class Dispositivos {
+public class Dispositivo {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(nullable = false, name = "idenficadorPlaca")
+    private String identificadorPlaca;
+
     @Column(nullable = false)
-    private String identificador_placa;
     private boolean ativo = true;
 
-    public Dispositivos() {
+    public Dispositivo() {
     }
 }
