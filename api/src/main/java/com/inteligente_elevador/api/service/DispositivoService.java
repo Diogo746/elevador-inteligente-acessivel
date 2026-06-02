@@ -6,6 +6,7 @@ import com.inteligente_elevador.api.exception.DispositivoInativoException;
 import com.inteligente_elevador.api.repository.DispositivoRepository;
 import com.inteligente_elevador.api.repository.EventoRepository;
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,6 @@ public class DispositivoService {
 
        String placaLimpa = identificador.trim();
 
-       return dispositivoRepository.findDispositivoByIdentificadorPlaca(identificador).orElseThrow(() -> new EntityExistsException("Placa não encontrada."));
+       return dispositivoRepository.findDispositivoByIdentificadorPlaca(placaLimpa).orElseThrow(() -> new EntityNotFoundException("Placa não encontrada."));
     }
 }
