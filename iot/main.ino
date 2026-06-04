@@ -1,252 +1,277 @@
-/*
-* ================================================================
-*  ESTRUTURA IoT — ELEVADOR INTELIGENTE ACESSÍVEL (EIA)
-*  Versão Local: Apenas Botão + LED (sem WiFi / MQTT)
-* ================================================================
-*
-*  BLOCO 1 — BIBLIOTECAS E DEPENDÊNCIAS
-*
-*  ✅ Arduino.h: necessária para funções básicas do ESP32.
-*
-*  ❌ WiFi.h       — COMENTADA: não precisamos de internet agora.
-*  ❌ PubSubClient.h — COMENTADA: é a biblioteca do MQTT (nuvem).
-*  ❌ ArduinoJson.h  — COMENTADA: era usada só para montar o JSON
-*                      do pacote enviado à nuvem.
-* ================================================================
-*/
-#include <Arduino.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+#include <LiquidCrystal_I2C.h>
+#include <time.h>
 
-// #include <WiFi.h>          // ❌ Sem WiFi nesta versão, vamos colocar na proxima
-// #include <PubSubClient.h>  // ❌ Sem MQTT nesta versão, vamos colocar na proxima
-// #include <ArduinoJson.h>   // ❌ Sem JSON nesta versão, vamos colocar na proxima
+#define PINO_SDA 8
+#define PINO_SCL 9
 
+// ===================== CONFIGURAÇÕES =====================
+const char* WIFI_SSID     = "wifi";
+const char* WIFI_PASSWORD = "senha_do_wifi";
+const char* SERVER_URL    = "http://ip_da_maquina/api/iot/evento";
 
-/*
-* ================================================================
-*  BLOCO 2 — VARIÁVEIS GLOBAIS
-* ================================================================
-*/
+// ===================== PINOS =============================
+const int BOTAO_PIN = 5;
+const int LED_PIN   = 2;
 
-// ── Identificação ─────────────────────────────────────────────
-const char* ID_ELEVADOR = "ELEVADOR-SENAC-01"; // Apenas para o Serial Monitor
+// ===================== VARIÁVEIS =========================
+bool estadoBotaoAnterior = HIGH;
+int contadorBotao = 0;
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-// ── Credenciais de Rede (WiFi) ────────────────────────────────
-// ❌ COMENTADAS: sem conexão de rede nesta versão
-// const char* WIFI_SSID     = "SENAC-Mesh";
-// const char* WIFI_SENHA    = "09080706";
-
-// ── Integração com a Nuvem (MQTT) ─────────────────────────────
-// ❌ COMENTADAS: sem envio para a nuvem nesta versão
-// const char* MQTT_SERVIDOR = "test.mosquitto.org";
-// const int   MQTT_PORTA    = 1883;
-// const char* TOPICO_ENVIO  = "senac/elevador/acessibilidade";
-
-// ── Hardware e Pinos (Esquemático) ────────────────────────────
-const int PINO_BOTAO = 4; // Pino onde o botão está ligado
-const int PINO_LED   = 2; // LED azul da placa (simula a porta abrindo)
-const int PINO_LED_LASER = 5;
-
-// ── Lógica e Regras de Negócio ────────────────────────────────
-const unsigned long TEMPO_PORTA  = 10000; // 10 segundos com a porta aberta
-const unsigned long TEMPO_DEBOUNCE = 50;  // 50 ms para filtrar ruído do botão
-const unsigned long TEMPO_PISCA = 300;
-
-// ── Variáveis de Estado do Sistema (Memória) ──────────────────
-unsigned long tempoAbertura   = 0;     // Momento em que a porta abriu
-unsigned long ultimoDebounce  = 0;     // Momento do último acionamento do botão
-unsigned long tempoPisca = 0;
-bool estadoLaser = false;
-bool portaAberta              = false; // Estado atual da porta
-
-// ── Objetos de Rede ───────────────────────────────────────────
-// ❌ COMENTADOS: dependem das bibliotecas WiFi e PubSubClient
-// WiFiClient clienteWiFi;
-// PubSubClient clienteMQTT(clienteWiFi);
-
-
-/*
-* ================================================================
-*  BLOCO 3 — PROTÓTIPOS DE FUNÇÕES (O "ÍNDICE" DO CÓDIGO)
-* ================================================================
-*/
-bool lerSensorBotao();
-void acionarPorta();
-
-// ❌ COMENTADOS: funções de internet não usadas nesta versão
-// void conectarWiFi();
-// void verificarConexoes();
-// bool enviarParaNuvem(String evento);
-
-
-/*
-* ================================================================
-*  BLOCO 4 — SETUP (INICIALIZAÇÃO)
-* ================================================================
-*/
+// ===================== SETUP =============================
 void setup() {
   Serial.begin(115200);
-  delay(500);
-  Serial.println("\n================================================");
-  Serial.println("  Sistema EIA — Elevador Inteligente Iniciando");
-  Serial.println("  Modo: Local (sem conexão de rede)");
-  Serial.println("================================================");
+  delay(2000);
 
-  // Configura os pinos
-  pinMode(PINO_LED, OUTPUT);
-  pinMode(PINO_BOTAO, INPUT_PULLUP); // Resistor interno: LOW = botão pressionado
-  pinMode(PINO_LED_LASER, OUTPUT);
-  digitalWrite(PINO_LED, LOW);       // Começa com o LED apagado (porta fechada)
-  digitalWrite(PINO_LED_LASER, LOW);
+  Wire.setPins(PINO_SDA, PINO_SCL);
+  Wire.begin();
+  lcd.init();
+  lcd.backlight();
 
-  // ❌ COMENTADOS: conexão com a internet não é necessária agora
-  // conectarWiFi();
-  // clienteMQTT.setServer(MQTT_SERVIDOR, MQTT_PORTA);
+  pinMode(BOTAO_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
 
-  Serial.println("[OK] Setup concluído. Monitorando botão...\n");
+  WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info) {
+    if (event == ARDUINO_EVENT_WIFI_STA_DISCONNECTED) {
+      Serial.println("=== DESCONECTOU ===");
+      Serial.print("Motivo: ");
+      Serial.println(info.wifi_sta_disconnected.reason);
+    }
+  });
+
+  conectarWiFi();
+
+  if (WiFi.status() == WL_CONNECTED) {
+    sincronizarHora();
+  } else {
+    Serial.println("Pulando sincronização da hora.");
+  }
+
+  Serial.println("Sistema pronto. Aguardando botão...");
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Esperando Botao");
 }
 
-
-/*
-* ================================================================
-*  BLOCO 5 — LOOP PRINCIPAL (O CORAÇÃO DO PROGRAMA)
-*  Fica repetindo sem parar, vigiando o botão e o relógio.
-* ================================================================
-*/
+// ===================== LOOP ==============================
 void loop() {
+  bool estadoBotaoAtual = digitalRead(BOTAO_PIN);
 
-  // ❌ COMENTADOS: manutenção das conexões de rede
-  // verificarConexoes();
-  // clienteMQTT.loop();
+  if (estadoBotaoAnterior == HIGH && estadoBotaoAtual == LOW) {
+    delay(50);
+    contadorBotao++;
 
-  // Passo 1: Ler o botão — se foi pressionado E a porta está fechada, abre!
-  if (lerSensorBotao()) {
-    portaAberta   = true;
-    tempoAbertura = millis(); // Marca o momento em que a porta abriu
-    Serial.println("[AÇÃO] Porta aberta! Aguardando 10 segundos...");
+    Serial.println("\nBotão pressionado! Total: " + String(contadorBotao));
+    digitalWrite(LED_PIN, LOW);
+
+    int httpCode = enviarEvento("PORTA_ABERTA");
+
+    if (httpCode == 200) {
+      Serial.println("Servidor respondeu 200 — Acendendo LED!");
+      acenderLED();
+    } else {
+      Serial.println("Erro — HTTP " + String(httpCode));
+    }
+
+    // Volta a tela de espera após a ação
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Esperando Botao");
   }
 
-  // Passo 2: Controlar o LED e o tempo de porta aberta
-  acionarPorta();
-
-  // ❌ COMENTADO: envio para a nuvem não é necessário agora
-  // if (statusMudou) {
-  //   String mensagem = portaAberta ? "Modo Acessível: Porta Aberta"
-  //                                 : "Modo Normal: Porta Fechada";
-  //   enviarParaNuvem(mensagem);
-  //   statusMudou = false;
-  // }
+  estadoBotaoAnterior = estadoBotaoAtual;
+  delay(50);
 }
 
+// ===================== WIFI ==============================
+void conectarWiFi() {
+  WiFi.disconnect(true);
+  delay(1000);
 
-/*
-* ================================================================
-*  BLOCO 6 — FUNÇÕES DE INTERNET (WIFI E MQTT)
-*  ❌ COMENTADAS COMPLETAMENTE: não usadas nesta versão local.
-*     Para reativar: descomente aqui e nos Blocos 2, 3, 4 e 5.
-* ================================================================
-*/
+  btStop();
+  WiFi.mode(WIFI_STA);
+  WiFi.setMinSecurity(WIFI_AUTH_WPA2_PSK);
+  WiFi.setScanMethod(WIFI_ALL_CHANNEL_SCAN);
+  WiFi.setSortMethod(WIFI_CONNECT_AP_BY_SIGNAL);
 
-// void conectarWiFi() {
-//   Serial.print("[WiFi] Conectando a rede: ");
-//   Serial.println(WIFI_SSID);
-//   WiFi.mode(WIFI_STA);
-//   WiFi.begin(WIFI_SSID, WIFI_SENHA);
-//   while (WiFi.status() != WL_CONNECTED) {
-//     delay(500);
-//     Serial.print(".");
-//   }
-//   Serial.println("\n[WiFi] Sucesso! Estamos online.");
-// }
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Conectando em:");
+  lcd.setCursor(0, 1);
+  lcd.print(String(WIFI_SSID));
 
-// void verificarConexoes() {
-//   if (WiFi.status() != WL_CONNECTED) {
-//     conectarWiFi();
-//   }
-//   while (!clienteMQTT.connected()) {
-//     Serial.print("[MQTT] Tentando conectar...");
-//     String clientId = "EIA-" + String(random(0xffff), HEX);
-//     if (clienteMQTT.connect(clientId.c_str())) {
-//       Serial.println(" Conectado!");
-//     } else {
-//       delay(2000);
-//     }
-//   }
-// }
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.setTxPower(WIFI_POWER_8_5dBm);
 
-
-/*
-* ================================================================
-*  BLOCO 7 — LEITURA DO SENSOR E VALIDAÇÃO
-*
-*  CORREÇÃO: o delay(200) original foi substituído por debounce
-*  por tempo (millis). O delay() trava o programa inteiro —
-*  com millis() o loop continua rodando normalmente.
-* ================================================================
-*/
-bool lerSensorBotao() {
-  // INPUT_PULLUP inverte a lógica: LOW = botão pressionado
-  bool botaoApertado = (digitalRead(PINO_BOTAO) == LOW);
-
-  if (botaoApertado && !portaAberta) {
-    // Debounce por tempo: só aceita o clique se passaram 50ms desde o último
-    if ((millis() - ultimoDebounce) >= TEMPO_DEBOUNCE) {
-      ultimoDebounce = millis();
-      Serial.println("[SENSOR] Botão de acessibilidade acionado!");
-      return true;
-    }
+  int tentativas = 0;
+  while (WiFi.status() != WL_CONNECTED && tentativas < 30) {
+    Serial.print("Tentativa ");
+    Serial.print(tentativas + 1);
+    Serial.print(" | Status: ");
+    Serial.println(WiFi.status());
+    delay(1000);
+    tentativas++;
   }
-  return false;
-}
 
+  Serial.println();
+  int statusFinal = WiFi.status();
 
-/*
-* ================================================================
-*  BLOCO 8 — ATUADOR (AGINDO NO MUNDO FÍSICO)
-* ================================================================
-*/
-void acionarPorta() {
-  if (portaAberta) {
-    digitalWrite(PINO_LED, HIGH); // Mantém LED aceso enquanto a porta está aberta
-
-    // Pisca o laser enquanto a porta estiver aberta
-    if ((millis() - tempoPisca) >= TEMPO_PISCA) {
-      estadoLaser = !estadoLaser;
-      digitalWrite(PINO_LED_LASER, estadoLaser ? HIGH : LOW);
-      tempoPisca = millis();
-    }
-
-    // Verifica se os 10 segundos já passaram
-    if ((millis() - tempoAbertura) >= TEMPO_PORTA) {
-      digitalWrite(PINO_LED, LOW); // Apaga o LED (fecha a porta)
-      portaAberta = false;
-      Serial.println("[ATUADOR] 10 segundos encerrados. Porta fechada.\n");
-    }
+  if (statusFinal == WL_CONNECTED) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("WiFi conectado!");
+    lcd.setCursor(0, 1);
+    lcd.print(WiFi.localIP().toString());
+    delay(3000);
+  } else if (statusFinal == WL_NO_SSID_AVAIL) {
+    Serial.println("ERRO: SSID não encontrado.");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("SSID nao");
+    lcd.setCursor(0, 1);
+    lcd.print("encontrado");
+  } else if (statusFinal == WL_CONNECT_FAILED) {
+    Serial.println("ERRO: Senha incorreta.");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Senha");
+    lcd.setCursor(0, 1);
+    lcd.print("incorreta");
+  } else if (statusFinal == WL_DISCONNECTED) {
+    Serial.println("ERRO: Dispositivo desconectado.");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Dispositivo");
+    lcd.setCursor(0, 1);
+    lcd.print("desconectado");
+  } else {
+    Serial.println("ERRO: Falha desconhecida. Status: " + String(statusFinal));
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Falha WiFi");
+    lcd.setCursor(0, 1);
+    lcd.print("Status: " + String(statusFinal));
   }
 }
 
+// ===================== ENVIO HTTP ========================
+int enviarEvento(String tipoEvento) {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("WiFi desconectado. Reconectando...");
+    conectarWiFi();
+    return -1;
+  }
 
-/*
-* ================================================================
-*  BLOCO 9 — ENVIO PARA A NUVEM (MQTT)
-*  ❌ COMENTADO COMPLETAMENTE: sem nuvem nesta versão local.
-*     Para reativar: descomente aqui e nos Blocos 2, 3, 4 e 5.
-* ================================================================
-*/
+  time_t agora    = time(nullptr);
+  struct tm* info = localtime(&agora);
 
-// bool enviarParaNuvem(String evento) {
-//   StaticJsonDocument<200> doc;
-//   doc["dispositivo"]  = ID_ELEVADOR;
-//   doc["evento"]       = evento;
-//   doc["porta_aberta"] = portaAberta;
-//   doc["timestamp"]    = millis();
-//   String pacoteJSON;
-//   serializeJson(doc, pacoteJSON);
-//   Serial.println("[NUVEM] Enviando pacote: " + pacoteJSON);
-//   bool sucesso = clienteMQTT.publish(TOPICO_ENVIO, pacoteJSON.c_str());
-//   if (sucesso) {
-//     Serial.println("[NUVEM] Sucesso! Aplicativo notificado.");
-//   } else {
-//     Serial.println("[NUVEM] Falha ao enviar a mensagem.");
-//   }
-//   return sucesso;
-// }
+  char data[11];
+  char hora[9];
+  strftime(data, sizeof(data), "%Y-%m-%d", info);
+  strftime(hora, sizeof(hora), "%H:%M:%S", info);
+
+  StaticJsonDocument<256> json;
+  json["tipo_evento"] = tipoEvento;
+  json["data_evento"] = data;
+  json["hora_evento"] = hora;
+
+  String corpo;
+  serializeJson(json, corpo);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Enviando");
+  lcd.setCursor(0, 1);
+  lcd.print("Requisicao...");
+
+  HTTPClient http;
+  http.begin(String(SERVER_URL) + "/criar");
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("idPlaca", WiFi.macAddress());
+  http.setTimeout(10000);
+
+  int httpCode = http.POST(corpo);
+
+  if (httpCode > 0) {
+    String body = http.getString();
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    if (httpCode == 200)      lcd.print("OK 200");
+    else if (httpCode == 201) lcd.print("Criado 201");
+    else if (httpCode == 400) lcd.print("Erro req 400");
+    else if (httpCode == 401) lcd.print("Sem auth 401");
+    else if (httpCode == 403) lcd.print("Proibido 403");
+    else if (httpCode == 404) lcd.print("N encontrado");
+    else if (httpCode == 500) lcd.print("Erro server");
+    else                      lcd.print("HTTP: " + String(httpCode));
+
+    lcd.setCursor(0, 1);
+    if (body.length() > 16) lcd.print(body.substring(0, 16));
+    else lcd.print(body);
+
+  } else {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Falha HTTP");
+    lcd.setCursor(0, 1);
+    lcd.print(http.errorToString(httpCode).substring(0, 16));
+  }
+
+  delay(3000); // tempo para ler o resultado antes de voltar à tela de espera
+  http.end();
+  return httpCode;
+}
+
+// ===================== LED ===============================
+void acenderLED() {
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(LED_PIN, HIGH);
+    delay(200);
+    digitalWrite(LED_PIN, LOW);
+    delay(200);
+  }
+
+  digitalWrite(LED_PIN, HIGH);
+  Serial.println("LED aceso por 5 segundos...");
+  delay(5000);
+
+  digitalWrite(LED_PIN, LOW);
+  Serial.println("LED apagado.");
+}
+
+// ===================== HORA ==============================
+void sincronizarHora() {
+  configTime(-3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Sincronizando");
+  lcd.setCursor(0, 1);
+  lcd.print("hora...");
+
+  int tentativas = 0;
+  while (time(nullptr) < 100000 && tentativas < 30) {
+    Serial.print(".");
+    delay(500);
+    tentativas++;
+  }
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  if (time(nullptr) >= 100000) {
+    lcd.print("Hora sincronizada");
+    lcd.setCursor(0, 1);
+    lcd.print("com sucesso!");
+  } else {
+    lcd.print("Falha ao");
+    lcd.setCursor(0, 1);
+    lcd.print("sincron. hora");
+  }
+  delay(2000);
+}
