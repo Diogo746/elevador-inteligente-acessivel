@@ -17,9 +17,21 @@ public class Dispositivo {
     @Column(nullable = false, name = "idenficadorPlaca")
     private String identificadorPlaca;
 
+    @Column(nullable = false, name = "apelido_placa")
+    private String apelidoPlaca;
+
     @Column(nullable = false)
     private boolean ativo = true;
 
+    public Dispositivo(String identificadorPlaca, String apelidoPlaca) {
+        this.identificadorPlaca = identificadorPlaca;
+        this.apelidoPlaca = apelidoPlaca;
+    }
+
     public Dispositivo() {
+    }
+
+    public void mudarStatus() {
+        this.ativo = !this.ativo;
     }
 }

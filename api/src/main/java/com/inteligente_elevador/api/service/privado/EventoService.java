@@ -1,14 +1,13 @@
-package com.inteligente_elevador.api.service;
+package com.inteligente_elevador.api.service.privado;
 
 
 import com.inteligente_elevador.api.domain.Dispositivo;
 import com.inteligente_elevador.api.domain.Evento;
 import com.inteligente_elevador.api.dto.EventoDto;
 import com.inteligente_elevador.api.repository.EventoRepository;
+import com.inteligente_elevador.api.service.DispositivoService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service

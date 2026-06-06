@@ -2,7 +2,7 @@ package com.inteligente_elevador.api.controller;
 
 import com.inteligente_elevador.api.domain.Dispositivo;
 import com.inteligente_elevador.api.dto.EventoDto;
-import com.inteligente_elevador.api.service.EventoService;
+import com.inteligente_elevador.api.service.privado.EventoService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
