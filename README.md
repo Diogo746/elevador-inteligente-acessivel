@@ -1,5 +1,7 @@
 # 🚀 Elevador Inteligente Acessível (EIA)
 
+🇧🇷 Português | 🇺🇸 [English Version](README_EN.md)
+
 ## 📌 Descrição
 
 O projeto **Elevador Inteligente Acessível (EIA)** foi desenvolvido com o objetivo de promover maior acessibilidade e autonomia para pessoas com mobilidade reduzida por meio da aplicação de tecnologias de **Internet das Coisas (IoT)**.
