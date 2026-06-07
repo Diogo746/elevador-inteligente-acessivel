@@ -50,7 +50,7 @@ The project implements an IoT-based solution capable of registering accessibilit
 
 # 📌 Use Case Diagram
 
-![Use Case Diagram](assets/CasodeUso.png)
+![Use Case Diagram](assets/UseCase_EN.png)
 
 ---
 
@@ -78,7 +78,7 @@ Web Dashboard
 
 ## 📷 Architecture Diagram
 
-![Architecture Diagram](assets/Diagrama.png)
+![Architecture Diagram](assets/Diagram_EN.png)
 
 ---
 
@@ -204,7 +204,7 @@ The project integrates knowledge acquired throughout the academic program and de
 
 # 🔁 System Flowchart
 
-![Flowchart](assets/Fluxograma.png)
+![Flowchart](assets/FlowChart_EN.png)
 
 ---
 
@@ -222,13 +222,13 @@ Implemented characteristics:
 * Operational continuity;
 * Reduced dependency on visualization services.
 
-![Resilient Architecture](assets/ArquiteturaResiliente.png)
+![Resilient Architecture](assets/ResilientArchitecture_EN.png)
 
 ---
 
 # 🔄 Sequence Diagram
 
-![Sequence Diagram](assets/DiagramaDeSequencia.png)
+![Sequence Diagram](assets/SequenceDiagram_EN.png)
 
 ---
 
