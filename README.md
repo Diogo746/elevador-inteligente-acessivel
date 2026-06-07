@@ -2,221 +2,45 @@
 
 ## 📌 Descrição
 
-O projeto **Elevador Inteligente Acessível (EIA)** tem como objetivo melhorar a acessibilidade em elevadores no ambiente do Senac, promovendo maior autonomia para pessoas com deficiência (PCDs) por meio de uma solução baseada em **IoT integrada com aplicação mobile e backend em nuvem**.
+O projeto **Elevador Inteligente Acessível (EIA)** foi desenvolvido com o objetivo de promover maior acessibilidade e autonomia para pessoas com mobilidade reduzida por meio da aplicação de tecnologias de **Internet das Coisas (IoT)**.
+
+A solução consiste em um dispositivo embarcado baseado em **ESP32**, responsável por registrar solicitações de acessibilidade através de um botão físico, processar informações localmente e enviar eventos para uma **API REST**, que realiza a validação do dispositivo e o armazenamento das informações em banco de dados **MySQL**.
+
+Além do registro dos eventos, o sistema disponibiliza um **dashboard web** para monitoramento e consulta dos dados coletados.
 
 ---
 
 ## 🎯 Problema
 
-Os elevadores convencionais não possuem mecanismos adaptativos inteligentes, resultando em:
+Elevadores convencionais normalmente não possuem mecanismos inteligentes voltados à acessibilidade, o que pode dificultar sua utilização por pessoas com deficiência ou mobilidade reduzida.
 
-- Dependência de terceiros para uso do elevador  
-- Tempo insuficiente de abertura de portas  
-- Risco de incidentes durante a entrada  
-- Baixa autonomia para usuários com mobilidade reduzida  
-
----
-
-## 💡 Solução
-
-O sistema proposto implementa um **modo acessível inteligente**, ativado por hardware, capaz de adaptar o comportamento do elevador.
-
-Principais funcionalidades:
-
-- Ativação do modo acessível via botão físico ou sensor  
-- Ajuste automático do tempo de abertura da porta  
-- Comunicação em tempo real entre dispositivos  
-- Registro de eventos no backend  
-- Visualização de status via aplicação mobile  
-
----
-
-### 📌 Diagrama de Caso de Uso
-
-![Caso de Uso](assets/CasodeUso.png)
-
----
-
-## 🏗️ Arquitetura do Sistema
-
-O sistema segue uma arquitetura distribuída baseada em IoT:
-Botão / Sensor → ESP32 → Wi-Fi → MQTT → Backend (Firebase) → Aplicação Mobile
-
-
-### 📷 Diagrama de Arquitetura
-
-![Diagrama de Arquitetura](assets/Diagrama.png)
-
----
-
-## ⚙️ Tecnologias Utilizadas
-
-- ESP32 (microcontrolador)
-- MQTT (comunicação IoT)
-- Wi-Fi
-- Firebase (backend e armazenamento)
-- Flutter / Figma (interface mobile)
-- Git/GitHub (controle de versão)
-
----
-
-## 🔄 Funcionamento
-
-1. Usuário ativa o sistema por botão ou sensor  
-2. O ESP32 detecta o evento  
-3. O modo acessível é ativado automaticamente  
-4. O tempo de abertura da porta é ajustado  
-5. O evento é enviado via MQTT para o backend  
-6. Os dados são armazenados no Firebase  
-7. O status pode ser visualizado no aplicativo mobile  
-
----
-
-### 🔁 Fluxograma do Sistema
-
-![Fluxograma](assets/Fluxograma.png)
----
-
-### 🛡️ Arquitetura Resiliente / Edge Computing
-
-![Fluxograma Resiliente](assets/ArquiteturaResiliente.png)
-
----
-
-### 🔄 Diagrama de Sequência
-
-![Diagrama de Sequência](assets/DiagramaDeSequencia.png)
-
----
-
-## 📋 Requisitos
-
-### ✔️ Funcionais
-
-- Ativação do modo acessível  
-- Ajuste automático do tempo da porta  
-- Comunicação entre ESP32 e backend via MQTT  
-- Registro de eventos no Firebase  
-- Exibição do estado do elevador no sistema  
-- Processamento de sensores físicos  
-- Retorno automático ao estado padrão  
-
-### ✔️ Não Funcionais
-
-- Tempo de resposta inferior a 2 segundos  
-- Comunicação MQTT confiável (QoS 1)  
-- Sistema com alta estabilidade de conexão  
-- Baixo consumo de recursos no ESP32  
-- Interface simples e intuitiva  
-- Não armazenamento de dados pessoais sensíveis (LGPD)  
-
----
-
-## 🔐 Segurança e LGPD
-
-O sistema segue o princípio de **Security by Design**, com foco em segurança desde a concepção.
-
-- Validação de comandos no backend  
-- Controle de acesso a dispositivos autorizados  
-- Comunicação segura entre IoT e backend  
-- Registro de logs para auditoria  
-- Coleta mínima de dados operacionais  
-- Conformidade com a LGPD (sem dados pessoais identificáveis)  
-
----
-
-## 🧪 Protótipo
-
-### 📡 IoT
-- ESP32 conectado via Wi-Fi  
-- Botão físico ou sensor de entrada  
-- LED simulando comportamento da porta  
-- Comunicação via MQTT
-
-
-### 📱 Mobile
-- Interface de monitoramento  
-- Visualização de status do elevador  
-- Histórico de eventos  
-
----
-
-## 📊 Backlog
-
-O projeto é organizado em tarefas no formato Kanban (GitHub Projects), dividido em:
-
-- Funcionalidades essenciais (MVP)  
-- Funcionalidades de suporte  
-- Melhorias futuras  
-
----
-
-## 🚀 Como Executar
-
-### 📡 IoT (ESP32)
-
-1. Conectar o ESP32 ao computador  
-2. Abrir o projeto na IDE Arduino  
-3. Configurar credenciais de Wi-Fi  
-4. Fazer upload do código  
-5. Monitorar via Serial Monitor  
-
----
-
-## 📁 Estrutura do Projeto
-
-/iot → Código do ESP32
-/mobile → Aplicação mobile
-/docs → Documentação técnica
-/assets → Imagens e diagramas
-
-
----
-
-## 📌 Observação Final
-
-Este projeto integra conceitos de **IoT, redes e desenvolvimento mobile**, demonstrando uma solução funcional para acessibilidade inteligente em ambientes institucionais.
-
----
-
-ReadMe 2
-
-# 🚀 Elevador Inteligente Acessível (EIA)
-
-## 📌 Descrição
-
-O projeto **Elevador Inteligente Acessível (EIA)** tem como objetivo promover maior autonomia para pessoas com mobilidade reduzida por meio de uma solução baseada em **Internet das Coisas (IoT)**.
-
-O sistema utiliza um dispositivo ESP32 conectado à rede Wi-Fi para registrar solicitações de acessibilidade, processar eventos localmente e enviá-los para uma API REST responsável pelo armazenamento das informações em banco de dados MySQL.
-
----
-
-## 🎯 Problema
-
-Elevadores convencionais frequentemente não oferecem mecanismos inteligentes que auxiliem pessoas com deficiência ou mobilidade reduzida, resultando em:
+Os principais problemas identificados foram:
 
 - Dependência de terceiros para utilização do elevador;
 - Tempo insuficiente para entrada e saída;
-- Falta de monitoramento dos eventos de acessibilidade;
+- Ausência de monitoramento dos eventos de acessibilidade;
+- Falta de indicadores para análise do uso do sistema;
 - Baixa autonomia dos usuários;
-- Ausência de métricas para análise e melhoria do serviço.
+- Ausência de integração entre dispositivos físicos e sistemas de gestão.
 
 ---
 
 ## 💡 Solução
 
-O EIA implementa um sistema inteligente capaz de registrar solicitações de acessibilidade e disponibilizar essas informações para monitoramento.
+O projeto implementa uma solução baseada em IoT capaz de registrar solicitações de acessibilidade e disponibilizar essas informações para monitoramento em tempo real.
 
-Principais funcionalidades:
+### Funcionalidades Implementadas
 
-- Acionamento por botão físico;
-- Registro de eventos em tempo real;
+- Acionamento através de botão físico;
+- Registro de eventos de acessibilidade;
 - Sincronização automática de data e hora via NTP;
-- Comunicação com API REST através de HTTP POST;
-- Armazenamento em banco MySQL;
-- Feedback visual por LED;
+- Comunicação HTTP com API REST;
+- Identificação do dispositivo através do MAC Address;
+- Persistência dos dados em banco MySQL;
+- Feedback visual utilizando LED;
 - Exibição de mensagens operacionais em display LCD I2C;
-- Reconexão automática em caso de falhas de rede.
+- Reconexão automática da rede Wi-Fi;
+- Disponibilização dos registros em dashboard web.
 
 ---
 
@@ -228,7 +52,7 @@ Principais funcionalidades:
 
 ## 🏗️ Arquitetura do Sistema
 
-A solução segue uma arquitetura distribuída baseada em IoT.
+A solução utiliza uma arquitetura distribuída baseada em Internet das Coisas.
 
 ```text
 Usuário
@@ -239,16 +63,77 @@ ESP32
    ↓
 Wi-Fi
    ↓
-API REST
+API REST (Spring Boot)
+   ↓
+Validação por MAC Address
    ↓
 Banco MySQL
    ↓
-Aplicação Web/Mobile
+Dashboard Web
 ```
 
 ### 📷 Diagrama de Arquitetura
 
 ![Diagrama de Arquitetura](assets/Diagrama.png)
+
+---
+
+## 🎓 Integração das Unidades Curriculares
+
+O projeto integra conhecimentos desenvolvidos ao longo do curso e demonstra a aplicação prática dos conteúdos estudados.
+
+### 🌐 Internet das Coisas (IoT)
+
+- Programação do ESP32;
+- Integração entre hardware e software;
+- Comunicação em rede;
+- Desenvolvimento do firmware embarcado;
+- Tratamento de eventos físicos.
+
+### ☁️ Cloud Computing
+
+- Integração entre dispositivos e serviços;
+- Comunicação entre sistemas distribuídos;
+- Disponibilização dos dados para monitoramento;
+- Consumo de APIs.
+
+### 🔐 Segurança de Sistemas
+
+- Identificação única por MAC Address;
+- Controle de dispositivos autorizados;
+- Rastreabilidade dos eventos;
+- Aplicação dos conceitos de Security by Design;
+- Conformidade com princípios da LGPD.
+
+### 📊 Análise e Projeto de Sistemas
+
+- Levantamento de requisitos;
+- Modelagem UML;
+- Diagramas do sistema;
+- Arquitetura da solução;
+- Documentação técnica.
+
+### ✅ Qualidade de Software
+
+- Tratamento de falhas;
+- Validação de respostas HTTP;
+- Testes funcionais;
+- Confiabilidade da solução;
+- Estratégias de mitigação de riscos.
+
+### 👥 Comportamento do Consumidor
+
+- Identificação da necessidade de acessibilidade;
+- Levantamento do problema;
+- Definição do público-alvo;
+- Justificativa da solução proposta.
+
+### 📱 Unidade de Extensão Mobile
+
+- Desenvolvimento do dashboard web;
+- Interface para visualização dos eventos;
+- Consulta de registros;
+- Monitoramento operacional.
 
 ---
 
@@ -259,57 +144,85 @@ Aplicação Web/Mobile
 - ESP32
 - Botão físico
 - LED indicador
-- Display LCD I2C
+- Display LCD I2C 16x2
 
-### Software
+### Firmware
 
+- C++
 - Arduino IDE
-- Linguagem C++
 - ArduinoJson
+- WiFi Library
 - HTTPClient
-- Wi-Fi Library
-- NTP
+- NTP (Network Time Protocol)
 
 ### Backend
 
+- Java 21
+- Spring Boot
+- Spring Data JPA
+- Spring Validation
 - API REST
+
+### Banco de Dados
+
 - MySQL
+
+### Front-End
+
+- V0
+- Vercel
+- Dashboard Web
 
 ### Ferramentas
 
 - Git
 - GitHub
-- Vercel
-- V0
+- Figma
+- Draw.io
 
 ---
 
 ## 🔄 Funcionamento
 
-1. O usuário aciona o botão de acessibilidade;
-2. O ESP32 detecta o evento;
-3. O sistema sincroniza data e hora;
-4. Um payload JSON é criado;
-5. O evento é enviado para a API REST;
-6. Os dados são armazenados no MySQL;
-7. O LCD exibe o resultado da operação;
-8. O LED confirma visualmente o processamento do evento.
+1. O usuário pressiona o botão de acessibilidade;
+2. O ESP32 detecta o acionamento;
+3. O dispositivo verifica a conectividade da rede Wi-Fi;
+4. O horário é sincronizado através do protocolo NTP;
+5. Um payload JSON é criado contendo data, hora e tipo do evento;
+6. O evento é enviado para a API REST através de uma requisição HTTP POST;
+7. A API valida a identificação do dispositivo através do MAC Address;
+8. Os dados são persistidos em banco MySQL;
+9. O LCD exibe o resultado da operação;
+10. O LED confirma visualmente o processamento do evento;
+11. O dashboard disponibiliza as informações registradas para consulta.
 
 ---
 
-### 🔁 Fluxograma do Sistema
+## 🔁 Fluxograma do Sistema
 
 ![Fluxograma](assets/Fluxograma.png)
 
 ---
 
-### 🛡️ Arquitetura Resiliente / Edge Computing
+## 🛡️ Arquitetura Resiliente / Edge Computing
 
-![Fluxograma Resiliente](assets/ArquiteturaResiliente.png)
+O sistema aplica conceitos de Edge Computing ao realizar parte do processamento diretamente no ESP32.
+
+Características implementadas:
+
+- Processamento local dos eventos;
+- Feedback imediato ao usuário;
+- Operação independente do dashboard;
+- Reconexão automática da rede;
+- Tratamento de falhas de comunicação;
+- Continuidade operacional;
+- Redução da dependência da camada de visualização.
+
+![Arquitetura Resiliente](assets/ArquiteturaResiliente.png)
 
 ---
 
-### 🔄 Diagrama de Sequência
+## 🔄 Diagrama de Sequência
 
 ![Diagrama de Sequência](assets/DiagramaDeSequencia.png)
 
@@ -317,81 +230,122 @@ Aplicação Web/Mobile
 
 ## 📋 Requisitos
 
-### ✔️ Funcionais
+### ✔️ Requisitos Funcionais
 
-- Detectar acionamento do botão;
-- Registrar eventos de acessibilidade;
-- Sincronizar data e hora via NTP;
-- Gerar payload JSON;
-- Enviar informações para API REST;
-- Armazenar dados em banco MySQL;
-- Exibir mensagens em LCD;
-- Acionar LED de confirmação.
+- RF01 – Detectar o acionamento do botão físico;
+- RF02 – Registrar eventos de acessibilidade;
+- RF03 – Sincronizar data e hora via NTP;
+- RF04 – Gerar payload JSON contendo informações do evento;
+- RF05 – Enviar eventos para API REST;
+- RF06 – Validar dispositivos autorizados;
+- RF07 – Armazenar dados em banco MySQL;
+- RF08 – Exibir mensagens operacionais no display LCD;
+- RF09 – Acionar LED indicador após confirmação da operação;
+- RF10 – Disponibilizar histórico de eventos;
+- RF11 – Permitir monitoramento através do dashboard web.
 
-### ✔️ Não Funcionais
+### ✔️ Requisitos Não Funcionais
 
-- Tempo de resposta inferior a 2 segundos;
-- Reconexão automática da rede Wi-Fi;
-- Tratamento de falhas HTTP;
-- Baixo consumo de recursos do ESP32;
-- Escalabilidade para aplicações futuras;
-- Conformidade com LGPD.
+- RNF01 – Operar utilizando rede Wi-Fi;
+- RNF02 – Utilizar protocolo HTTP;
+- RNF03 – Utilizar formato JSON para troca de dados;
+- RNF04 – Possuir identificação única do dispositivo;
+- RNF05 – Possuir tratamento de falhas de rede;
+- RNF06 – Possuir tratamento de erros HTTP;
+- RNF07 – Garantir persistência dos dados;
+- RNF08 – Possuir arquitetura escalável;
+- RNF09 – Possuir baixo consumo de recursos;
+- RNF10 – Permitir monitoramento remoto;
+- RNF11 – Atender aos princípios da LGPD.
 
 ---
 
 ## 🔐 Segurança e LGPD
 
-O projeto adota princípios de **Security by Design**.
+O projeto foi desenvolvido seguindo os princípios de **Security by Design**, incorporando mecanismos de segurança desde sua concepção.
 
-Medidas implementadas:
+### Medidas Implementadas
 
-- Registro apenas de dados operacionais;
-- Ausência de informações pessoais dos usuários;
 - Identificação do dispositivo por MAC Address;
-- Comunicação estruturada via API REST;
-- Preparação para uso de credenciais protegidas;
+- Validação de dispositivos autorizados;
+- Registro de eventos para rastreabilidade;
+- Armazenamento apenas de dados operacionais;
+- Ausência de coleta de dados pessoais identificáveis;
+- Estrutura preparada para autenticação futura;
 - Conformidade com os princípios da LGPD.
 
 ---
 
-## 🧪 Protótipo
+## 🧪 MVP Desenvolvido
 
-### 📡 IoT
+### 📡 Camada IoT
 
 - ESP32 conectado à rede Wi-Fi;
-- Botão físico para acionamento;
-- Display LCD I2C para feedback operacional;
-- LED indicador de confirmação;
-- Comunicação com API REST via HTTP.
+- Botão físico de acionamento;
+- Display LCD I2C;
+- LED indicador;
+- Comunicação HTTP com API REST;
+- Sincronização de horário via NTP.
 
 ### 🗄️ Backend
 
-- API REST para recebimento dos eventos;
-- Persistência dos dados em banco MySQL;
-- Registro de data, hora e dispositivo responsável.
+- API REST desenvolvida em Spring Boot;
+- Persistência em banco MySQL;
+- Validação de dispositivos;
+- Registro de data, hora e identificação do dispositivo.
 
-### 📱 Aplicação Web/Mobile
+### 📱 Dashboard Web
 
-- Dashboard de monitoramento;
-- Consulta de eventos registrados;
-- Visualização de estatísticas;
-- Histórico de acionamentos.
+- Monitoramento dos eventos;
+- Consulta ao histórico;
+- Visualização dos registros;
+- Interface desenvolvida com V0 e hospedada na Vercel.
 
 ---
 
 ## 📸 Evidências do Projeto
 
-### Protótipo Físico
+### 📷 Protótipo Físico
 
-*(Inserir foto do ESP32 montado com botão, LED e LCD)*
+> Inserir foto do ESP32 montado com botão, LED e display LCD.
 
-### Serial Monitor
+![Protótipo](assets/FotoPrototipo.jpg)
 
-*(Inserir captura de tela da execução do firmware)*
+### 💻 Serial Monitor
 
-### Aplicação Web/Mobile
+> Inserir captura de tela da execução do firmware.
 
-*(Inserir capturas de tela da interface desenvolvida no V0)*
+![Serial Monitor](assets/SerialMonitor.png)
+
+### 📱 Dashboard Web
+
+> Inserir captura de tela do dashboard desenvolvido.
+
+![Dashboard](assets/Dashboard.png)
+
+### 🗄️ Banco de Dados
+
+> Inserir captura de tela dos registros armazenados no MySQL.
+
+![Banco de Dados](assets/MySQL.png)
+
+---
+
+## 📈 Resultados Obtidos
+
+Durante os testes realizados foi possível validar:
+
+- Conexão Wi-Fi do ESP32;
+- Sincronização de horário via NTP;
+- Comunicação HTTP com a API REST;
+- Validação de dispositivos autorizados;
+- Persistência dos dados em MySQL;
+- Funcionamento do display LCD;
+- Funcionamento do LED indicador;
+- Atualização do dashboard;
+- Integração entre todas as camadas do sistema.
+
+Os resultados demonstraram a viabilidade técnica da solução e a integração bem-sucedida entre hardware, software, banco de dados e interface de monitoramento.
 
 ---
 
@@ -399,12 +353,21 @@ Medidas implementadas:
 
 O projeto é organizado utilizando GitHub Projects no modelo Kanban.
 
-Divisão das atividades:
+### Itens do MVP
 
-- MVP (Produto Mínimo Viável);
-- Melhorias funcionais;
-- Evoluções futuras;
-- Integrações complementares.
+- Registro de eventos;
+- Comunicação com API;
+- Persistência dos dados;
+- Dashboard de monitoramento.
+
+### Evoluções Futuras
+
+- Sensores de presença;
+- Aplicativo mobile nativo;
+- Dashboard analítico avançado;
+- Notificações em tempo real;
+- Monitoramento de múltiplos elevadores;
+- Indicadores avançados de acessibilidade.
 
 ---
 
@@ -414,10 +377,24 @@ Divisão das atividades:
 
 1. Conectar o ESP32 ao computador;
 2. Abrir o projeto na Arduino IDE;
-3. Configurar credenciais Wi-Fi;
-4. Configurar URL da API;
-5. Realizar upload do firmware;
-6. Monitorar execução pelo Serial Monitor.
+3. Instalar as bibliotecas necessárias;
+4. Configurar SSID e senha da rede Wi-Fi;
+5. Configurar a URL da API;
+6. Realizar upload do firmware;
+7. Monitorar a execução através do Serial Monitor.
+
+### Backend
+
+1. Configurar banco de dados MySQL;
+2. Ajustar credenciais da aplicação;
+3. Executar a API Spring Boot;
+4. Validar o endpoint de recebimento dos eventos.
+
+### Dashboard
+
+1. Executar o projeto frontend;
+2. Configurar integração com a API;
+3. Publicar na Vercel.
 
 ---
 
@@ -425,22 +402,22 @@ Divisão das atividades:
 
 ```text
 /iot
-  └── Código ESP32
+ └── Firmware ESP32
 
-/backend
-  └── API REST
+/api
+ └── API REST Spring Boot
 
 /database
-  └── Scripts MySQL
+ └── Scripts MySQL
 
 /mobile
-  └── Aplicação Web/Mobile
+ └── Dashboard Web
 
 /docs
-  └── Documentação
+ └── Relatórios e documentação
 
 /assets
-  └── Diagramas e imagens
+ └── Diagramas e imagens
 ```
 
 ---
@@ -448,16 +425,20 @@ Divisão das atividades:
 ## 🔮 Melhorias Futuras
 
 - Integração com sensores de presença;
+- Aplicativo mobile completo;
 - Dashboard analítico avançado;
 - Notificações em tempo real;
-- Aplicativo mobile completo;
 - Monitoramento de múltiplos elevadores;
-- Indicadores de acessibilidade e uso.
+- Indicadores de acessibilidade e utilização;
+- Integração com sistemas institucionais;
+- Relatórios automáticos de utilização.
 
 ---
 
 ## 📌 Conclusão
 
-O Elevador Inteligente Acessível (EIA) demonstra a aplicação prática de conceitos de Internet das Coisas, sistemas embarcados, comunicação em rede e acessibilidade.
+O projeto **Elevador Inteligente Acessível (EIA)** demonstra a aplicação prática dos conceitos de Internet das Coisas, Cloud Computing, Segurança de Sistemas, Qualidade de Software, Desenvolvimento Mobile e Análise de Sistemas.
 
-A solução integra hardware, software e banco de dados para criar uma plataforma capaz de registrar eventos de acessibilidade, promover monitoramento operacional e servir como base para futuras evoluções voltadas à inclusão e transformação digital.
+A solução integra hardware, software, banco de dados e interface web para criar uma plataforma capaz de registrar eventos de acessibilidade, armazenar informações de forma estruturada e disponibilizar monitoramento em tempo real.
+
+Os resultados obtidos comprovam a viabilidade da proposta e evidenciam o potencial da tecnologia para contribuir com iniciativas voltadas à inclusão, acessibilidade e transformação digital em ambientes institucionais.
