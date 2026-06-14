@@ -313,7 +313,7 @@ The project was developed following **Security by Design** principles, incorpora
 
 
 
-![Prototype](assets/FotoPrototipo.jepg)
+![Prototype](assets/FotoPrototipo.jpeg)
 
 ## 💻 Serial Monitor
 
