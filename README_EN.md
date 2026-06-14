@@ -311,27 +311,22 @@ The project was developed following **Security by Design** principles, incorpora
 
 ## 📷 Physical Prototype
 
-> Insert a photo of the assembled ESP32 prototype with button, LED, and LCD display.
 
-![Prototype](assets/FotoPrototipo.jpg)
+
+![Prototype](assets/FotoPrototipo.jepg)
 
 ## 💻 Serial Monitor
 
-> Insert a screenshot of the firmware execution.
 
-![Serial Monitor](assets/SerialMonitor.png)
+
+![Serial Monitor](assets/SerialMonitor.jpeg)
 
 ## 📱 Web Dashboard
 
-> Insert screenshots of the developed dashboard.
+
 
 ![Dashboard](assets/Dashboard.png)
 
-## 🗄️ Database
-
-> Insert a screenshot of the records stored in MySQL.
-
-![Database](assets/MySQL.png)
 
 ---
 
