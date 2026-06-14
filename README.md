@@ -311,7 +311,8 @@ O projeto foi desenvolvido seguindo os princípios de **Security by Design**, in
 
 > Inserir foto do ESP32 montado com botão, LED e display LCD.
 
-![Protótipo](assets/FotoPrototipo.jpg)
+![Protótipo](assets/FotoPrototipo.jpeg)
+
 
 ### 💻 Serial Monitor
 
