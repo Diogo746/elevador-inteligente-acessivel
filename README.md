@@ -318,7 +318,7 @@ O projeto foi desenvolvido seguindo os princípios de **Security by Design**, in
 
 > Inserir captura de tela da execução do firmware.
 
-![Serial Monitor](assets/SerialMonitor.png)
+![Serial Monitor](assets/SerialMonitor.jpeg)
 
 ### 📱 Dashboard Web
 
