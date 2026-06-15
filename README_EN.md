@@ -2,6 +2,11 @@
 
 🇺🇸 English | 🇧🇷 [Portuguese Version](README.md)
 
+Authors (Team Members)
+- Christopher Lindoso (Hardware Development)
+- Davi Francisco (Cloud Dashboard and Documentation)
+- José Mário (Embedded Software and HTTP Configuration)
+
 ---
 # ⚙️ Installation & Setup
 
