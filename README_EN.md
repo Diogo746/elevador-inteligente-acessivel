@@ -2,11 +2,6 @@
 
 🇺🇸 English | 🇧🇷 [Portuguese Version](README.md)
 
-Authors (Team Members)
-- Christopher Lindoso (Hardware Development)
-- Davi Francisco (Cloud Dashboard and Documentation)
-- José Mário (Embedded Software and HTTP Configuration)
-
 ---
 # ⚙️ Installation & Setup
 
@@ -502,6 +497,13 @@ The project is organized using GitHub Projects and the Kanban methodology.
 * Accessibility and usage indicators;
 * Integration with institutional systems;
 * Automated usage reports.
+
+---
+
+Authors (Team Members)
+- Christopher Lindoso (Hardware Development)
+- Davi Francisco (Cloud Dashboard and Documentation)
+- José Mário (Embedded Software and HTTP Configuration)
 
 ---
 
