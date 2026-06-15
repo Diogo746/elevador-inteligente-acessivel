@@ -3,6 +3,72 @@
 🇺🇸 English | 🇧🇷 [Portuguese Version](README.md)
 
 ---
+# ⚙️ Installation & Setup
+
+## Prerequisites
+
+Before getting started, make sure you have the following installed:
+
+- [Java 21](https://www.oracle.com/java/technologies/downloads/#java21)
+- [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)
+- [MySQL](https://dev.mysql.com/downloads/mysql/)
+
+---
+
+## 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+```
+
+---
+
+## 2. Create the Database
+
+Open your MySQL client and run:
+
+```sql
+CREATE DATABASE api_elevador_inteligente;
+```
+
+---
+
+## 3. Configure Environment Variables
+
+Navigate to the `/api` folder and create a `.env` file:
+
+```bash
+cd api
+cp .env.example .env
+```
+
+Open the `.env` file and replace the placeholder values with your actual MySQL connection credentials:
+
+```env
+DB_URL=jdbc:mysql://localhost:3306/api_elevador_inteligente
+DB_USERNAME=your_mysql_username
+DB_PASSWORD=your_mysql_password
+```
+
+---
+
+## 4. Run the Backend
+
+**Option A — Via IntelliJ IDEA:**
+
+Open the `/api` folder in IntelliJ IDEA, make sure the Java 21 SDK is configured, and click **Run**.
+
+**Option B — Via Terminal:**
+
+Inside the `/api` folder, run:
+
+```bash
+mvn clean install
+mvn spring-boot:run
+```
+
+The API will be available at `http://localhost:8080`.
 
 # 📌 Description
 
